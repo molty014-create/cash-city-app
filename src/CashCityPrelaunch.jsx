@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
+import CEOGallery from './components/CEOGallery';
 
 // Fire-and-forget analytics tracking
 const trackEvent = (eventName, walletAddress = null, twitterUsername = null, metadata = {}) => {
@@ -1199,21 +1200,22 @@ https://cashcity.fun`
 
             {/* Volume Slider */}
             {showVolumeSlider && (
-              <div style={{
+              <div className="volume-slider-popup" style={{
                 position: 'absolute',
                 top: '100%',
                 right: 0,
                 marginTop: '8px',
-                padding: '12px 16px',
+                padding: 'clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px)',
                 backgroundColor: 'rgba(35, 60, 55, 0.95)',
                 border: '1px solid rgba(93, 130, 120, 0.3)',
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                zIndex: 100
+                gap: 'clamp(6px, 1.5vw, 10px)',
+                zIndex: 100,
+                minWidth: 'clamp(120px, 30vw, 160px)'
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(247, 247, 232, 0.5)" strokeWidth="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(247, 247, 232, 0.5)" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                 </svg>
                 <input
@@ -1224,17 +1226,18 @@ https://cashcity.fun`
                   value={volume}
                   onChange={(e) => setVolume(parseFloat(e.target.value))}
                   style={{
-                    width: '80px',
+                    width: 'clamp(60px, 15vw, 80px)',
                     height: '4px',
                     WebkitAppearance: 'none',
                     appearance: 'none',
                     backgroundColor: 'rgba(93, 130, 120, 0.3)',
                     borderRadius: '2px',
                     cursor: 'pointer',
-                    accentColor: '#D5E59B'
+                    accentColor: '#D5E59B',
+                    flex: 1
                   }}
                 />
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(247, 247, 232, 0.5)" strokeWidth="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(247, 247, 232, 0.5)" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                   <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
                 </svg>
@@ -1416,6 +1419,9 @@ https://cashcity.fun`
                 <ApplicantTicker />
               </div>
             </div>
+
+            {/* CEO Gallery - Hall of Fame */}
+            <CEOGallery />
 
             {/* Application Card */}
             <div className="app-card" style={{
@@ -1753,7 +1759,7 @@ https://cashcity.fun`
                   </button>
 
                   <p style={{
-                    fontSize: '12px',
+                    fontSize: 'clamp(11px, 2.5vw, 12px)',
                     color: 'rgba(247, 247, 232, 0.5)',
                     textAlign: 'center',
                     marginTop: '8px'
@@ -1765,24 +1771,24 @@ https://cashcity.fun`
 
               {/* Countdown Timer - Inside Card */}
               <div style={{
-                marginTop: '24px',
-                paddingTop: '24px',
+                marginTop: 'clamp(16px, 4vw, 24px)',
+                paddingTop: 'clamp(16px, 4vw, 24px)',
                 borderTop: '1px solid rgba(93, 130, 120, 0.3)',
                 textAlign: 'center'
               }}>
                 <div style={{
-                  fontSize: '11px',
+                  fontSize: 'clamp(10px, 2.5vw, 11px)',
                   color: 'rgba(247, 247, 232, 0.5)',
                   letterSpacing: '1px',
                   textTransform: 'uppercase',
-                  marginBottom: '12px'
+                  marginBottom: 'clamp(8px, 2vw, 12px)'
                 }}>
                   Applications end in
                 </div>
-                <div style={{
+                <div className="countdown-timer-card" style={{
                   display: 'flex',
                   justifyContent: 'center',
-                  gap: '20px'
+                  gap: 'clamp(12px, 4vw, 20px)'
                 }}>
                   {[
                     { value: countdown.days, label: 'Days' },
@@ -1791,17 +1797,17 @@ https://cashcity.fun`
                     { value: countdown.seconds, label: 'Secs' }
                   ].map((unit, i) => (
                     <div key={i} style={{ textAlign: 'center' }}>
-                      <div style={{
+                      <div className="countdown-value" style={{
                         fontFamily: "'Moderno Sans', sans-serif",
-                        fontSize: '24px',
+                        fontSize: 'clamp(18px, 5vw, 24px)',
                         fontWeight: '400',
                         color: '#D5E59B',
                         lineHeight: 1
                       }}>
                         {String(unit.value).padStart(2, '0')}
                       </div>
-                      <div style={{
-                        fontSize: '10px',
+                      <div className="countdown-label" style={{
+                        fontSize: 'clamp(8px, 2vw, 10px)',
                         color: 'rgba(247, 247, 232, 0.4)',
                         marginTop: '4px',
                         textTransform: 'uppercase',
@@ -1816,11 +1822,12 @@ https://cashcity.fun`
             </div>
 
             {/* Footer note */}
-            <p style={{
+            <p className="footer-note" style={{
               textAlign: 'center',
-              fontSize: '14px',
+              fontSize: 'clamp(12px, 3vw, 14px)',
               color: 'rgba(247, 247, 232, 0.4)',
-              marginTop: '24px'
+              marginTop: 'clamp(16px, 4vw, 24px)',
+              padding: '0 16px'
             }}>
               Cash City is invite-only. Forever. Get Early Access now.
             </p>
