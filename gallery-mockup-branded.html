@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meet the CEOs - Cash City</title>
+  
+  <!-- Import Moderno Sans font (Cash City brand font) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    
+    /* Moderno Sans - Cash City's signature font */
+    @font-face {
+      font-family: 'Moderno Sans';
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #0a0f0d 0%, #141a18 50%, #0a0f0d 100%);
+      color: #F7F7E8;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background pattern (from actual site) */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(213, 229, 155, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(74, 222, 128, 0.02) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header styling matching Cash City */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-label {
+      display: inline-block;
+      padding: 8px 16px;
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 20px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(74, 222, 128, 0.9);
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-family: 'Moderno Sans', 'Inter', sans-serif;
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 400;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      color: #F7F7E8;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: rgba(247, 247, 232, 0.7);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Stats bar matching Cash City style */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Moderno Sans', 'Inter', sans-serif;
+      font-size: clamp(28px, 5vw, 36px);
+      font-weight: 400;
+      color: #D5E59B;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: rgba(247, 247, 232, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(93, 130, 120, 0.3);
+    }
+
+    /* Gallery grid */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    /* CEO Card matching Cash City aesthetic */
+    .ceo-card {
+      background: rgba(35, 60, 55, 0.6);
+      border: 1px solid rgba(93, 130, 120, 0.3);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .ceo-card:hover {
+      transform: translateY(-8px);
+      border-color: #D5E59B;
+      box-shadow: 0 12px 40px rgba(213, 229, 155, 0.15);
+    }
+
+    .ceo-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: #1a2520;
+      border-bottom: 1px solid rgba(93, 130, 120, 0.2);
+    }
+
+    .verified-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(74, 222, 128, 0.95);
+      color: #0a0f0d;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+    }
+
+    .ceo-info {
+      padding: 20px;
+    }
+
+    .ceo-handle {
+      font-size: 18px;
+      font-weight: 600;
+      color: #D5E59B;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .ceo-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: rgba(247, 247, 232, 0.5);
+      margin-bottom: 16px;
+    }
+
+    .app-number {
+      color: rgba(213, 229, 155, 0.7);
+      font-weight: 600;
+    }
+
+    .ceo-traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .trait-badge {
+      padding: 6px 12px;
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 16px;
+      font-size: 11px;
+      color: rgba(74, 222, 128, 0.9);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    /* Load more button matching Cash City */
+    .load-more {
+      display: block;
+      margin: 0 auto;
+      padding: 18px 32px;
+      background: transparent;
+      border: 2px solid #D5E59B;
+      border-radius: 12px;
+      color: #D5E59B;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .load-more:hover {
+      background: #D5E59B;
+      color: #0a0f0d;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(213, 229, 155, 0.3);
+    }
+
+    /* Detail overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 15, 13, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      padding: 40px 20px;
+      overflow-y: auto;
+    }
+
+    .overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-card {
+      max-width: 800px;
+      background: rgba(35, 60, 55, 0.95);
+      border: 1px solid rgba(93, 130, 120, 0.5);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .detail-image {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(93, 130, 120, 0.3);
+    }
+
+    .detail-content {
+      padding: 32px;
+    }
+
+    .detail-handle {
+      font-family: 'Moderno Sans', 'Inter', sans-serif;
+      font-size: 32px;
+      color: #D5E59B;
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
+
+    .detail-meta {
+      color: rgba(247, 247, 232, 0.6);
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .verified-text {
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    .detail-traits {
+      margin-bottom: 32px;
+    }
+
+    .tweet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: #D5E59B;
+      color: #0a0f0d;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .tweet-btn:hover {
+      background: #c5d58b;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(213, 229, 155, 0.4);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #F7F7E8;
+      font-size: 28px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .container { padding: 40px 16px; }
+      h1 { font-size: 32px; letter-spacing: 2px; }
+      .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+      .stats-bar { gap: 24px; }
+      .stat-divider { display: none; }
+      .detail-content { padding: 24px; }
+      .close-btn { top: 20px; right: 20px; width: 40px; height: 40px; font-size: 24px; }
+    }
+
+    /* Animation for cards */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .ceo-card {
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
+
+    .ceo-card:nth-child(1) { animation-delay: 0.05s; }
+    .ceo-card:nth-child(2) { animation-delay: 0.1s; }
+    .ceo-card:nth-child(3) { animation-delay: 0.15s; }
+    .ceo-card:nth-child(4) { animation-delay: 0.2s; }
+    .ceo-card:nth-child(5) { animation-delay: 0.25s; }
+    .ceo-card:nth-child(6) { animation-delay: 0.3s; }
+    .ceo-card:nth-child(7) { animation-delay: 0.35s; }
+    .ceo-card:nth-child(8) { animation-delay: 0.4s; }
+    .ceo-card:nth-child(9) { animation-delay: 0.45s; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="section-label">✨ Hall of Fame</div>
+      <h1>Meet the CEOs</h1>
+      <p class="subtitle">The finest trading firm leaders in Cash City. Join the ranks.</p>
+    </header>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-number">1,247</div>
+        <div class="stat-label">Applications</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-number">892</div>
+        <div class="stat-label">Verified</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-number">24</div>
+        <div class="stat-label">Last Hour</div>
+      </div>
+    </div>
+
+    <div class="gallery" id="gallery"></div>
+
+    <button class="load-more" onclick="loadMore()">Load More</button>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeDetail()">
+    <button class="close-btn" onclick="closeDetail()">×</button>
+    <div class="detail-card" onclick="event.stopPropagation()">
+      <img class="detail-image" id="detailImage" src="" alt="">
+      <div class="detail-content">
+        <h2 class="detail-handle" id="detailHandle"></h2>
+        <div class="detail-meta" id="detailMeta"></div>
+        <div class="detail-traits" id="detailTraits"></div>
+        <a class="tweet-btn" id="detailTweet" href="#" target="_blank">
+          <span>View Tweet</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock CEO data (would come from Supabase in production)
+    const mockCEOs = [
+      { 
+        handle: '@CryptoWhale', 
+        app: 1247, 
+        time: '2h ago', 
+        traits: ['Visionary', 'Risk-taker', 'Charismatic'],
+        verified: true,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-1.png'
+      },
+      { 
+        handle: '@DeFiGuru', 
+        app: 1246, 
+        time: '3h ago', 
+        traits: ['Analytical', 'Strategic', 'Bold'],
+        verified: true,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-2.png'
+      },
+      { 
+        handle: '@MoonShot', 
+        app: 1245, 
+        time: '4h ago', 
+        traits: ['Ambitious', 'Innovative', 'Decisive'],
+        verified: false,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-3.png'
+      },
+      { 
+        handle: '@DiamondHands', 
+        app: 1244, 
+        time: '5h ago', 
+        traits: ['Patient', 'Calculating', 'Ruthless'],
+        verified: true,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-4.png'
+      },
+      { 
+        handle: '@WhaleMaker', 
+        app: 1243, 
+        time: '6h ago', 
+        traits: ['Influential', 'Connected', 'Savvy'],
+        verified: true,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-5.png'
+      },
+      { 
+        handle: '@StackSats', 
+        app: 1242, 
+        time: '7h ago', 
+        traits: ['Disciplined', 'Focused', 'Methodical'],
+        verified: false,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-6.png'
+      },
+      { 
+        handle: '@CryptoKing', 
+        app: 1241, 
+        time: '8h ago', 
+        traits: ['Dominant', 'Aggressive', 'Fearless'],
+        verified: true,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-7.png'
+      },
+      { 
+        handle: '@YieldFarmer', 
+        app: 1240, 
+        time: '9h ago', 
+        traits: ['Opportunistic', 'Adaptive', 'Quick'],
+        verified: true,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-8.png'
+      },
+      { 
+        handle: '@AlphaMale', 
+        app: 1239, 
+        time: '10h ago', 
+        traits: ['Confident', 'Assertive', 'Leader'],
+        verified: false,
+        image: 'https://replicate.delivery/yhqm/placeholder-ceo-9.png'
+      },
+    ];
+
+    function renderGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = mockCEOs.map(ceo => `
+        <div class="ceo-card" onclick="showDetail('${ceo.handle}')">
+          ${ceo.verified ? '<div class="verified-badge">✓ Verified</div>' : ''}
+          <img class="ceo-image" src="https://via.placeholder.com/400x400/1a2520/D5E59B?text=${ceo.handle.slice(1)}" alt="${ceo.handle}">
+          <div class="ceo-info">
+            <div class="ceo-handle">${ceo.handle}</div>
+            <div class="ceo-meta">
+              <span class="app-number">#${ceo.app}</span>
+              <span>${ceo.time}</span>
+            </div>
+            <div class="ceo-traits">
+              ${ceo.traits.map(trait => `<span class="trait-badge">${trait}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showDetail(handle) {
+      const ceo = mockCEOs.find(c => c.handle === handle);
+      document.getElementById('detailImage').src = `https://via.placeholder.com/800x600/1a2520/D5E59B?text=${handle.slice(1)}+CEO`;
+      document.getElementById('detailHandle').textContent = handle;
+      document.getElementById('detailMeta').innerHTML = `
+        Application #${ceo.app} • ${ceo.time}
+        ${ceo.verified ? '<span class="verified-text">✓ Tweet Verified</span>' : '<span style="color: rgba(247, 247, 232, 0.4);">⏳ Awaiting verification</span>'}
+      `;
+      document.getElementById('detailTraits').innerHTML = `
+        <div class="ceo-traits">
+          ${ceo.traits.map(trait => `<span class="trait-badge" style="font-size: 13px; padding: 8px 14px;">${trait}</span>`).join('')}
+        </div>
+      `;
+      document.getElementById('detailTweet').href = ceo.verified 
+        ? `https://twitter.com/${handle.slice(1)}/status/123456789` 
+        : '#';
+      document.getElementById('overlay').classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    function loadMore() {
+      alert('In production: Load 9 more CEOs from database');
+    }
+
+    // Initial render
+    renderGallery();
+
+    // Simulate real-time updates (every 30s in production)
+    // setInterval(renderGallery, 30000);
+  </script>
+</body>
+</html>

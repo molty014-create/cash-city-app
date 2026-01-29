@@ -1340,7 +1340,7 @@ https://cashcity.fun`
               <p className="hero-subtitle" style={{
                 fontSize: 'clamp(14px, 3.5vw, 18px)',
                 color: 'rgba(247, 247, 232, 0.7)',
-                maxWidth: '500px',
+                maxWidth: 'min(500px, calc(100% - 32px))',
                 margin: '0 auto',
                 lineHeight: 1.6,
                 padding: '0 8px'
@@ -1878,7 +1878,7 @@ https://cashcity.fun`
                   <p style={{
                     fontSize: '18px',
                     color: 'rgba(247, 247, 232, 0.7)',
-                    maxWidth: '500px',
+                    maxWidth: 'min(500px, calc(100% - 32px))',
                     margin: '0 auto',
                     lineHeight: 1.6
                   }}>
@@ -1891,8 +1891,8 @@ https://cashcity.fun`
                   backgroundColor: 'rgba(35, 60, 55, 0.7)',
                   border: '1px solid rgba(93, 130, 120, 0.4)',
                   borderRadius: '24px',
-                  padding: '32px',
-                  maxWidth: '500px',
+                  padding: 'clamp(20px, 5vw, 32px)',
+                  maxWidth: 'min(500px, calc(100% - 32px))',
                   margin: '0 auto'
                 }}>
                   {/* Stats inside card */}
@@ -2257,7 +2257,7 @@ https://cashcity.fun`
                   border: '1px solid rgba(93, 130, 120, 0.4)',
                   borderRadius: '24px',
                   padding: '0',
-                  maxWidth: '650px',
+                  maxWidth: 'min(650px, calc(100% - 32px))',
                   margin: '0 auto',
                   overflow: 'hidden'
                 }}>
@@ -3258,19 +3258,20 @@ https://cashcity.fun`
                 </div>
                 
                 <p style={{
-                  fontSize: '16px',
+                  fontSize: 'clamp(14px, 3.5vw, 16px)',
                   color: 'rgba(247, 247, 232, 0.7)',
                   marginBottom: '40px',
-                  maxWidth: '400px',
+                  maxWidth: 'min(400px, calc(100% - 32px))',
                   margin: '0 auto 40px',
+                  padding: '0 16px',
                   animation: 'fadeInUp 0.6s ease-out 0.4s both'
                 }}>
                   Your tweet has been verified. We'll announce selected CEOs on Thursday.
                 </p>
 
                 {/* Confirmed Card */}
-                <div style={{
-                  maxWidth: '400px',
+                <div className="confirmed-card" style={{
+                  maxWidth: 'min(400px, calc(100% - 32px))',
                   margin: '0 auto 32px',
                   animation: 'fadeInUp 0.6s ease-out 0.5s both'
                 }}>
@@ -3380,10 +3381,10 @@ https://cashcity.fun`
                 </div>
 
                 {/* What's Next */}
-                <div style={{
-                  maxWidth: '400px',
+                <div className="whats-next-card" style={{
+                  maxWidth: 'min(400px, calc(100% - 32px))',
                   margin: '0 auto',
-                  padding: '20px',
+                  padding: 'clamp(12px, 3vw, 20px)',
                   backgroundColor: 'rgba(35, 60, 55, 0.4)',
                   border: '1px solid rgba(93, 130, 120, 0.2)',
                   borderRadius: '12px',
@@ -3496,8 +3497,8 @@ https://cashcity.fun`
                 </h1>
 
                 {/* Unified CEO Badge Card */}
-                <div style={{
-                  maxWidth: '420px',
+                <div className="confirmed-card" style={{
+                  maxWidth: 'min(420px, calc(100% - 32px))',
                   margin: '0 auto 32px',
                   animation: 'scaleIn 0.6s ease-out 0.2s both'
                 }}>

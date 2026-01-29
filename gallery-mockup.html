@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery Mockup - Cash City CEOs</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #0a0f0d 0%, #1a2520 100%);
+      color: #F7F7E8;
+      padding: 60px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      color: #D5E59B;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: rgba(247, 247, 232, 0.6);
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: rgba(35, 60, 55, 0.4);
+      border: 1px solid rgba(93, 130, 120, 0.3);
+      border-radius: 12px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 600;
+      color: #D5E59B;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: rgba(247, 247, 232, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .ceo-card {
+      background: rgba(35, 60, 55, 0.6);
+      border: 1px solid rgba(93, 130, 120, 0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .ceo-card:hover {
+      transform: translateY(-8px);
+      border-color: #D5E59B;
+      box-shadow: 0 12px 40px rgba(213, 229, 155, 0.2);
+    }
+
+    .ceo-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: #1a2520;
+    }
+
+    .ceo-info {
+      padding: 16px;
+    }
+
+    .ceo-handle {
+      font-size: 16px;
+      font-weight: 600;
+      color: #D5E59B;
+      margin-bottom: 4px;
+    }
+
+    .ceo-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: rgba(247, 247, 232, 0.5);
+      margin-bottom: 12px;
+    }
+
+    .ceo-traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .trait-badge {
+      padding: 4px 8px;
+      background: rgba(74, 222, 128, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 12px;
+      font-size: 11px;
+      color: #4ade80;
+    }
+
+    .verified-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(74, 222, 128, 0.9);
+      color: #0a0f0d;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .load-more {
+      display: block;
+      margin: 0 auto;
+      padding: 16px 32px;
+      background: transparent;
+      border: 2px solid #D5E59B;
+      border-radius: 12px;
+      color: #D5E59B;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .load-more:hover {
+      background: #D5E59B;
+      color: #0a0f0d;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 15, 13, 0.95);
+      z-index: 1000;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-card {
+      max-width: 800px;
+      background: rgba(35, 60, 55, 0.9);
+      border: 1px solid rgba(93, 130, 120, 0.5);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .detail-image {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+    }
+
+    .detail-content {
+      padding: 32px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #F7F7E8;
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 32px; }
+      .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+      .stats-bar { flex-direction: column; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Meet the CEOs</h1>
+      <p class="subtitle">The finest trading firm leaders in Cash City</p>
+    </header>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-number">1,247</div>
+        <div class="stat-label">Total CEOs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">892</div>
+        <div class="stat-label">Verified</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">24</div>
+        <div class="stat-label">Last Hour</div>
+      </div>
+    </div>
+
+    <div class="gallery" id="gallery">
+      <!-- Mock CEOs - in production these would be real data -->
+    </div>
+
+    <button class="load-more" onclick="loadMore()">Load More CEOs</button>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeDetail()">
+    <button class="close-btn" onclick="closeDetail()">×</button>
+    <div class="detail-card" onclick="event.stopPropagation()">
+      <img class="detail-image" id="detailImage" src="" alt="">
+      <div class="detail-content">
+        <h2 id="detailHandle" style="font-size: 28px; color: #D5E59B; margin-bottom: 12px;"></h2>
+        <div id="detailMeta" style="color: rgba(247, 247, 232, 0.6); margin-bottom: 20px;"></div>
+        <div id="detailTraits" style="margin-bottom: 24px;"></div>
+        <a id="detailTweet" href="#" target="_blank" style="display: inline-block; padding: 12px 24px; background: #D5E59B; color: #0a0f0d; text-decoration: none; border-radius: 8px; font-weight: 600;">View Tweet →</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock CEO data
+    const mockCEOs = [
+      { handle: '@CryptoWhale', app: 1247, time: '2h ago', traits: ['Visionary', 'Risk-taker', 'Charismatic'], verified: true },
+      { handle: '@DeFiGuru', app: 1246, time: '3h ago', traits: ['Analytical', 'Strategic', 'Bold'], verified: true },
+      { handle: '@MoonShot', app: 1245, time: '4h ago', traits: ['Ambitious', 'Innovative', 'Decisive'], verified: false },
+      { handle: '@DiamondHands', app: 1244, time: '5h ago', traits: ['Patient', 'Calculating', 'Ruthless'], verified: true },
+      { handle: '@WhaleMaker', app: 1243, time: '6h ago', traits: ['Influential', 'Connected', 'Savvy'], verified: true },
+      { handle: '@StackSats', app: 1242, time: '7h ago', traits: ['Disciplined', 'Focused', 'Methodical'], verified: false },
+      { handle: '@CryptoKing', app: 1241, time: '8h ago', traits: ['Dominant', 'Aggressive', 'Fearless'], verified: true },
+      { handle: '@YieldFarmer', app: 1240, time: '9h ago', traits: ['Opportunistic', 'Adaptive', 'Quick'], verified: true },
+      { handle: '@AlphaMale', app: 1239, time: '10h ago', traits: ['Confident', 'Assertive', 'Leader'], verified: false },
+    ];
+
+    function renderGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = mockCEOs.map(ceo => `
+        <div class="ceo-card" onclick="showDetail('${ceo.handle}')">
+          ${ceo.verified ? '<div class="verified-badge">✓ Verified</div>' : ''}
+          <img class="ceo-image" src="https://via.placeholder.com/400x400/1a2520/D5E59B?text=${ceo.handle.slice(1)}" alt="${ceo.handle}">
+          <div class="ceo-info">
+            <div class="ceo-handle">${ceo.handle}</div>
+            <div class="ceo-meta">
+              <span>Application #${ceo.app}</span>
+              <span>${ceo.time}</span>
+            </div>
+            <div class="ceo-traits">
+              ${ceo.traits.map(trait => `<span class="trait-badge">${trait}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showDetail(handle) {
+      const ceo = mockCEOs.find(c => c.handle === handle);
+      document.getElementById('detailImage').src = `https://via.placeholder.com/800x600/1a2520/D5E59B?text=${handle.slice(1)}`;
+      document.getElementById('detailHandle').textContent = handle;
+      document.getElementById('detailMeta').innerHTML = `
+        Application #${ceo.app} • ${ceo.time}
+        ${ceo.verified ? '<span style="color: #4ade80;">✓ Tweet Verified</span>' : ''}
+      `;
+      document.getElementById('detailTraits').innerHTML = `
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          ${ceo.traits.map(trait => `<span class="trait-badge" style="font-size: 14px; padding: 6px 12px;">${trait}</span>`).join('')}
+        </div>
+      `;
+      document.getElementById('overlay').classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    function loadMore() {
+      alert('Would load 9 more CEOs from the database');
+    }
+
+    // Initial render
+    renderGallery();
+
+    // Auto-refresh every 30s (in production)
+    // setInterval(renderGallery, 30000);
+  </script>
+</body>
+</html>
