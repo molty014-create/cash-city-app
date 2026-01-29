@@ -35,9 +35,15 @@
       ]
     }
   ],
+  "routes": [
+    {
+      "src": "/analytics",
+      "dest": "/analytics/index.html"
+    }
+  ],
   "rewrites": [
     {
-      "source": "/((?!assets/|analytics\\.html).*)",
+      "source": "/((?!assets/|analytics).*)",
       "destination": "/index.html"
     }
   ]
