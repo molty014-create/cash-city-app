@@ -405,6 +405,56 @@ async function generateWithReplicate(prompt: string, negativePrompt: string, bas
 // Application deadline: Feb 3, 2026 at 4pm UTC
 const DEADLINE = new Date('2026-02-03T16:00:00Z')
 
+// Upload image to Supabase Storage for permanent hosting
+async function uploadToStorage(
+  imageUrl: string,
+  walletAddress: string,
+  supabase: ReturnType<typeof createClient>
+): Promise<string> {
+  console.log('Downloading image from Replicate...')
+
+  // Download the image from Replicate
+  const imageResponse = await fetch(imageUrl)
+  if (!imageResponse.ok) {
+    throw new Error(`Failed to download image: ${imageResponse.status}`)
+  }
+
+  const imageBuffer = await imageResponse.arrayBuffer()
+  const contentType = imageResponse.headers.get('content-type') || 'image/webp'
+
+  // Determine file extension from content type
+  let ext = 'webp'
+  if (contentType.includes('png')) ext = 'png'
+  else if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = 'jpg'
+
+  // Create unique filename using wallet address and timestamp
+  const timestamp = Date.now()
+  const fileName = `${walletAddress.slice(0, 8)}_${timestamp}.${ext}`
+
+  console.log(`Uploading to storage: ${fileName} (${imageBuffer.byteLength} bytes)`)
+
+  // Upload to Supabase Storage
+  const { data, error } = await supabase.storage
+    .from('ceo-images')
+    .upload(fileName, imageBuffer, {
+      contentType,
+      upsert: false
+    })
+
+  if (error) {
+    console.error('Storage upload error:', error)
+    throw new Error(`Failed to upload to storage: ${error.message}`)
+  }
+
+  // Get the public URL
+  const { data: urlData } = supabase.storage
+    .from('ceo-images')
+    .getPublicUrl(data.path)
+
+  console.log('Image uploaded successfully:', urlData.publicUrl)
+  return urlData.publicUrl
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req)
 
@@ -488,13 +538,18 @@ serve(async (req) => {
     // Step 3: Generate character with Replicate Seedream 4.5
     // Strength 0.70 allows for good customization while preserving the base character
     console.log('Step 3: Calling Replicate Seedream 4.5 to reskin base character...')
-    const generatedImageUrl = await generateWithReplicate(prompt, negativePrompt, BASE_SCENE_URL, REPLICATE_API_TOKEN, 0.70)
-    console.log('Step 3 complete:', generatedImageUrl)
+    const replicateImageUrl = await generateWithReplicate(prompt, negativePrompt, BASE_SCENE_URL, REPLICATE_API_TOKEN, 0.70)
+    console.log('Step 3 complete:', replicateImageUrl)
+
+    // Step 4: Upload to Supabase Storage for permanent URL
+    console.log('Step 4: Uploading to Supabase Storage...')
+    const permanentImageUrl = await uploadToStorage(replicateImageUrl, wallet_address, supabase)
+    console.log('Step 4 complete:', permanentImageUrl)
 
     return successResponse(
       {
         success: true,
-        image_url: generatedImageUrl,
+        image_url: permanentImageUrl,
         prompt: prompt,
         analysis: analysis,
         model: 'gemini-2.0-flash-v2'

@@ -3,6 +3,14 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 
+// Fire-and-forget analytics tracking
+const trackEvent = (eventName, walletAddress = null, twitterUsername = null, metadata = {}) => {
+  if (!isSupabaseConfigured()) return;
+  supabase.functions.invoke('track-event', {
+    body: { event_name: eventName, wallet_address: walletAddress, twitter_username: twitterUsername, metadata }
+  }).catch(() => {}); // Silent fail - don't impact UX
+};
+
 // Confetti component
 const Confetti = ({ active }) => {
   const [particles, setParticles] = useState([]);
@@ -279,6 +287,7 @@ const CashCityPrelaunch = () => {
       );
       await signMessage(message);
       setWalletVerified(true);
+      trackEvent('wallet_connected', publicKey.toString());
       // Persist verification for this session (survives OAuth redirect)
       sessionStorage.setItem(`wallet_verified_${publicKey.toString()}`, 'true');
     } catch (error) {
@@ -315,6 +324,7 @@ const CashCityPrelaunch = () => {
 
   // Fetch real application stats on mount
   useEffect(() => {
+    trackEvent('page_view'); // Track page view
     const fetchStats = async () => {
       if (isSupabaseConfigured()) {
         try {
@@ -599,6 +609,7 @@ const CashCityPrelaunch = () => {
         };
         setUserData(user);
         setXLinked(true);
+        trackEvent('twitter_linked', publicKey?.toString(), username);
         sessionStorage.setItem('twitter_user', JSON.stringify(user));
         sessionStorage.removeItem('twitter_code_verifier');
       } else {
@@ -739,6 +750,7 @@ const CashCityPrelaunch = () => {
 
           setImageGenerating(false);
           setImageReady(true);
+          trackEvent('image_generated', publicKey?.toString(), userData?.handle?.replace('@', ''));
           setApplicationNumber(savedApplicationNumber || applicationCount + Math.floor(Math.random() * 50) + 1);
         } catch (genErr) {
           console.error('Generation failed:', genErr);
@@ -747,6 +759,7 @@ const CashCityPrelaunch = () => {
           setGeneratedImage(mockCEOImages[Math.floor(Math.random() * mockCEOImages.length)]);
           setImageGenerating(false);
           setImageReady(true);
+          trackEvent('image_generated', publicKey?.toString(), userData?.handle?.replace('@', ''));
           setApplicationNumber(savedApplicationNumber || applicationCount + Math.floor(Math.random() * 50) + 1);
         }
       } else {
@@ -755,6 +768,7 @@ const CashCityPrelaunch = () => {
           clearInterval(msgInterval);
           setImageGenerating(false);
           setImageReady(true);
+          trackEvent('image_generated', publicKey?.toString(), userData?.handle?.replace('@', ''));
           setGeneratedImage(mockCEOImages[Math.floor(Math.random() * mockCEOImages.length)]);
           setApplicationNumber(savedApplicationNumber || applicationCount + Math.floor(Math.random() * 50) + 1);
         }, 7000);
@@ -812,6 +826,7 @@ const CashCityPrelaunch = () => {
               setTweetVerifying(false);
               setTweetVerifyFailed(false);
               setTweetVerified(true);
+              trackEvent('tweet_verified', publicKey?.toString(), userData?.handle?.replace('@', ''));
               setVerifiedTweetUrl(data.tweet_url || null);
               setShowConfetti(true);
               setTimeout(() => setShowConfetti(false), 4000);
@@ -836,6 +851,7 @@ const CashCityPrelaunch = () => {
           clearInterval(msgInterval);
           setTweetVerifying(false);
           setTweetVerified(true);
+          trackEvent('tweet_verified', publicKey?.toString(), userData?.handle?.replace('@', ''));
           setShowConfetti(true);
           setTimeout(() => setShowConfetti(false), 4000);
         }, 5500);
@@ -1060,47 +1076,49 @@ https://cashcity.fun`
 
 
       {/* Header */}
-      <header style={{
+      <header className="cash-city-header" style={{
         position: 'relative',
         zIndex: 10,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '20px 32px',
+        padding: 'clamp(12px, 3vw, 20px) clamp(16px, 4vw, 32px)',
         borderBottom: '1px solid rgba(93, 130, 120, 0.2)',
         background: 'linear-gradient(180deg, rgba(10,15,13,0.95) 0%, transparent 100%)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img 
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)' }}>
+          <img
             src={LOGO_URL}
             alt="Cash City"
             style={{
-              width: '48px',
-              height: '48px',
+              width: 'clamp(36px, 8vw, 48px)',
+              height: 'clamp(36px, 8vw, 48px)',
               objectFit: 'contain'
             }}
           />
-          <span style={{
+          <span className="header-logo" style={{
             fontFamily: "'Moderno Sans', sans-serif",
-            fontSize: '20px',
+            fontSize: 'clamp(14px, 3.5vw, 20px)',
             fontWeight: '400',
-            letterSpacing: '3px',
+            letterSpacing: 'clamp(1px, 0.4vw, 3px)',
             textTransform: 'uppercase'
           }}>Cash City</span>
         </div>
-        
+
         {/* Connected indicators */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)' }}>
           {walletConnected && (
-            <div style={{
+            <div className="wallet-address" style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '8px 14px',
+              gap: '6px',
+              padding: 'clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px)',
               backgroundColor: 'rgba(74, 222, 128, 0.1)',
               border: '1px solid rgba(74, 222, 128, 0.3)',
               borderRadius: '8px',
-              fontSize: '13px'
+              fontSize: 'clamp(11px, 2.5vw, 13px)',
+              maxWidth: 'clamp(100px, 25vw, 180px)',
+              overflow: 'hidden'
             }}>
               <div style={{
                 width: '8px',
@@ -1113,22 +1131,22 @@ https://cashcity.fun`
           )}
           
           {xLinked && userData && (
-            <div style={{
+            <div className="x-account-badge" style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px 6px 6px',
+              gap: 'clamp(4px, 1vw, 8px)',
+              padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px) clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px)',
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '8px',
-              fontSize: '13px'
+              fontSize: 'clamp(11px, 2.5vw, 13px)'
             }}>
               <img
                 src={userData.profileImage}
                 alt=""
                 style={{
-                  width: '26px',
-                  height: '26px',
+                  width: 'clamp(22px, 5vw, 26px)',
+                  height: 'clamp(22px, 5vw, 26px)',
                   borderRadius: '50%',
                   backgroundColor: '#2d4a47'
                 }}
@@ -1226,19 +1244,21 @@ https://cashcity.fun`
 
           {walletConnected && (
             <button
+              className="logout-btn"
               onClick={() => { playClick(); handleLogout(); }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 12px',
+                padding: 'clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px)',
                 backgroundColor: 'transparent',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: '8px',
                 color: 'rgba(247, 247, 232, 0.6)',
-                fontSize: '12px',
+                fontSize: 'clamp(11px, 2.5vw, 12px)',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                minHeight: '36px'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(255, 107, 107, 0.5)';
@@ -1254,14 +1274,14 @@ https://cashcity.fun`
                 <polyline points="16 17 21 12 16 7"/>
                 <line x1="21" y1="12" x2="9" y2="12"/>
               </svg>
-              Logout
+              <span>Logout</span>
             </button>
           )}
         </div>
       </header>
 
       {/* Main Content */}
-      <main style={{
+      <main className="cash-city-main" style={{
         position: 'relative',
         zIndex: 10,
         maxWidth: '900px',
@@ -1300,13 +1320,13 @@ https://cashcity.fun`
                     Early Access Applications Open
                   </div>
 
-                  <h1 style={{
+                  <h1 className="hero-title" style={{
                     fontFamily: "'Moderno Sans', sans-serif",
-                    fontSize: '52px',
+                    fontSize: 'clamp(32px, 8vw, 52px)',
                     fontWeight: '400',
                     margin: '0 0 16px',
                     lineHeight: 1.1,
-                    letterSpacing: '4px',
+                    letterSpacing: 'clamp(1px, 0.5vw, 4px)',
                 textTransform: 'uppercase',
                 color: '#F7F7E8',
                 textShadow: '0 4px 20px rgba(0,0,0,0.5)'
@@ -1314,12 +1334,13 @@ https://cashcity.fun`
                 Become a CEO
               </h1>
               
-              <p style={{
-                fontSize: '18px',
+              <p className="hero-subtitle" style={{
+                fontSize: 'clamp(14px, 3.5vw, 18px)',
                 color: 'rgba(247, 247, 232, 0.7)',
                 maxWidth: '500px',
                 margin: '0 auto',
-                lineHeight: 1.6
+                lineHeight: 1.6,
+                padding: '0 8px'
               }}>
                 Apply for early access to Cash City.
               </p>
@@ -1330,25 +1351,25 @@ https://cashcity.fun`
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '20px',
-              marginBottom: '48px'
+              gap: 'clamp(12px, 3vw, 20px)',
+              marginBottom: 'clamp(24px, 6vw, 48px)'
             }}>
-              <div style={{
+              <div className="stats-container" style={{
                 display: 'flex',
                 justifyContent: 'center',
-                gap: '48px'
+                gap: 'clamp(24px, 6vw, 48px)'
               }}>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{
+                  <div className="stat-number" style={{
                     fontFamily: "'Moderno Sans', sans-serif",
-                    fontSize: '36px',
+                    fontSize: 'clamp(24px, 6vw, 36px)',
                     fontWeight: '400',
                     color: '#D5E59B'
                   }}>
                     <AnimatedCounter target={applicationCount} duration={1500} />
                   </div>
                   <div style={{
-                    fontSize: '12px',
+                    fontSize: 'clamp(10px, 2.5vw, 12px)',
                     color: 'rgba(247, 247, 232, 0.5)',
                     letterSpacing: '1px',
                     textTransform: 'uppercase'
@@ -1356,21 +1377,21 @@ https://cashcity.fun`
                     Applications
                   </div>
                 </div>
-                <div style={{
+                <div className="stats-divider" style={{
                   width: '1px',
                   backgroundColor: 'rgba(93, 130, 120, 0.3)'
                 }} />
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{
+                  <div className="stat-number" style={{
                     fontFamily: "'Moderno Sans', sans-serif",
-                    fontSize: '36px',
+                    fontSize: 'clamp(24px, 6vw, 36px)',
                     fontWeight: '400',
                     color: '#F7F7E8'
                   }}>
                     LIMITED
                   </div>
                   <div style={{
-                    fontSize: '12px',
+                    fontSize: 'clamp(10px, 2.5vw, 12px)',
                     color: 'rgba(247, 247, 232, 0.5)',
                     letterSpacing: '1px',
                     textTransform: 'uppercase'
@@ -1381,12 +1402,13 @@ https://cashcity.fun`
               </div>
               
               {/* Live applicant ticker */}
-              <div style={{
-                padding: '12px 24px',
+              <div className="applicant-ticker" style={{
+                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px)',
                 backgroundColor: 'rgba(74, 222, 128, 0.1)',
                 border: '1px solid rgba(74, 222, 128, 0.2)',
                 borderRadius: '20px',
-                minWidth: '280px',
+                minWidth: 'min(280px, 90vw)',
+                maxWidth: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -1396,23 +1418,23 @@ https://cashcity.fun`
             </div>
 
             {/* Application Card */}
-            <div style={{
+            <div className="app-card" style={{
               backgroundColor: 'rgba(35, 60, 55, 0.6)',
               border: '1px solid rgba(93, 130, 120, 0.3)',
               borderRadius: '20px',
-              padding: '32px',
-              maxWidth: '480px',
+              padding: 'clamp(20px, 5vw, 32px)',
+              maxWidth: 'min(480px, 100%)',
               margin: '0 auto'
             }}>
               {/* Card Title */}
               <h2 style={{
                 fontFamily: "'Moderno Sans', sans-serif",
-                fontSize: '20px',
+                fontSize: 'clamp(16px, 4vw, 20px)',
                 fontWeight: '400',
                 color: '#F7F7E8',
                 textAlign: 'center',
-                marginBottom: '24px',
-                letterSpacing: '2px',
+                marginBottom: 'clamp(16px, 4vw, 24px)',
+                letterSpacing: 'clamp(1px, 0.3vw, 2px)',
                 textTransform: 'uppercase'
               }}>
                 Apply Now
@@ -1422,15 +1444,15 @@ https://cashcity.fun`
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                marginBottom: '32px',
+                marginBottom: 'clamp(24px, 5vw, 32px)',
                 position: 'relative'
               }}>
                 {/* Progress line */}
-                <div style={{
+                <div className="progress-line" style={{
                   position: 'absolute',
-                  top: '16px',
-                  left: '40px',
-                  right: '40px',
+                  top: 'clamp(12px, 3vw, 16px)',
+                  left: 'clamp(30px, 8vw, 40px)',
+                  right: 'clamp(30px, 8vw, 40px)',
                   height: '2px',
                   backgroundColor: 'rgba(93, 130, 120, 0.3)'
                 }}>
@@ -1441,16 +1463,16 @@ https://cashcity.fun`
                     transition: 'width 0.3s ease'
                   }} />
                 </div>
-                
+
                 {[
                   { label: 'Wallet', done: walletConnected },
                   { label: 'X Account', done: xLinked },
                   { label: 'Apply', done: false }
                 ].map((step, i) => (
                   <div key={i} style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
+                    <div className="progress-step-circle" style={{
+                      width: 'clamp(28px, 7vw, 32px)',
+                      height: 'clamp(28px, 7vw, 32px)',
                       borderRadius: '50%',
                       backgroundColor: step.done ? '#D5E59B' : 'rgba(93, 130, 120, 0.3)',
                       display: 'flex',
@@ -1458,14 +1480,14 @@ https://cashcity.fun`
                       justifyContent: 'center',
                       margin: '0 auto 8px',
                       color: step.done ? '#0a0f0d' : 'rgba(247, 247, 232, 0.5)',
-                      fontSize: '14px',
+                      fontSize: 'clamp(12px, 3vw, 14px)',
                       fontWeight: '600',
                       transition: 'all 0.3s ease'
                     }}>
                       {step.done ? '✓' : i + 1}
                     </div>
                     <div style={{
-                      fontSize: '12px',
+                      fontSize: 'clamp(10px, 2.5vw, 12px)',
                       color: step.done ? '#D5E59B' : 'rgba(247, 247, 232, 0.5)'
                     }}>
                       {step.label}
@@ -1478,14 +1500,16 @@ https://cashcity.fun`
               {!walletConnected && (
                 <button
                   onClick={() => { playClick(); openWalletModal(); }}
+                  className="touch-btn"
                   style={{
                     width: '100%',
-                    padding: '18px',
+                    padding: 'clamp(14px, 3.5vw, 18px)',
+                    minHeight: '44px',
                     backgroundColor: '#D5E59B',
                     border: 'none',
                     borderRadius: '12px',
                     color: '#0a0f0d',
-                    fontSize: '16px',
+                    fontSize: 'clamp(14px, 3.5vw, 16px)',
                     fontWeight: '700',
                     cursor: 'pointer',
                     display: 'flex',
@@ -1578,14 +1602,16 @@ https://cashcity.fun`
 
                   <button
                     onClick={() => { playClick(); handleLinkX(); }}
+                    className="touch-btn"
                     style={{
                       width: '100%',
-                      padding: '18px',
+                      padding: 'clamp(14px, 3.5vw, 18px)',
+                      minHeight: '44px',
                       backgroundColor: '#D5E59B',
                       border: 'none',
                       borderRadius: '12px',
                       color: '#0a0f0d',
-                      fontSize: '16px',
+                      fontSize: 'clamp(14px, 3.5vw, 16px)',
                       fontWeight: '700',
                       cursor: 'pointer',
                       display: 'flex',
@@ -1616,47 +1642,49 @@ https://cashcity.fun`
               {walletConnected && xLinked && userData && (
                 <div>
                   {/* User Profile Card */}
-                  <div style={{
+                  <div className="user-profile-card" style={{
                     backgroundColor: 'rgba(0,0,0,0.2)',
                     border: '1px solid rgba(93, 130, 120, 0.2)',
                     borderRadius: '12px',
-                    padding: '16px',
+                    padding: 'clamp(12px, 3vw, 16px)',
                     marginBottom: '20px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '16px'
+                    gap: 'clamp(12px, 3vw, 16px)',
+                    flexWrap: 'wrap'
                   }}>
                     <img
                       src={userData.profileImage}
                       alt=""
+                      className="user-profile-avatar"
                       style={{
-                        width: '56px',
-                        height: '56px',
+                        width: 'clamp(48px, 12vw, 56px)',
+                        height: 'clamp(48px, 12vw, 56px)',
                         borderRadius: '50%',
                         border: '2px solid #D5E59B'
                       }}
                     />
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: '120px' }}>
                       <div style={{
-                        fontSize: '16px',
+                        fontSize: 'clamp(14px, 3.5vw, 16px)',
                         fontWeight: '600',
                         marginBottom: '4px'
                       }}>
                         {userData.name}
                       </div>
                       <div style={{
-                        fontSize: '14px',
+                        fontSize: 'clamp(12px, 3vw, 14px)',
                         color: 'rgba(247, 247, 232, 0.6)'
                       }}>
                         {userData.handle} · {formatNumber(userData.followers)} followers
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="profile-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{
                         padding: '4px 10px',
                         backgroundColor: 'rgba(74, 222, 128, 0.15)',
                         borderRadius: '6px',
-                        fontSize: '12px',
+                        fontSize: 'clamp(10px, 2.5vw, 12px)',
                         color: '#4ADE80'
                       }}>
                         ✓ Linked
@@ -1668,9 +1696,10 @@ https://cashcity.fun`
                           backgroundColor: 'transparent',
                           border: '1px solid rgba(247, 247, 232, 0.3)',
                           borderRadius: '6px',
-                          fontSize: '11px',
+                          fontSize: 'clamp(10px, 2.5vw, 11px)',
                           color: 'rgba(247, 247, 232, 0.6)',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          minHeight: '32px'
                         }}
                       >
                         Unlink
@@ -1682,14 +1711,16 @@ https://cashcity.fun`
                   <button
                     onClick={() => { playClick(); handleSubmit(); }}
                     disabled={isApplicationsClosed}
+                    className="touch-btn"
                     style={{
                       width: '100%',
-                      padding: '20px',
+                      padding: 'clamp(16px, 4vw, 20px)',
+                      minHeight: '44px',
                       backgroundColor: isApplicationsClosed ? 'rgba(100, 100, 100, 0.5)' : '#D5E59B',
                       border: 'none',
                       borderRadius: '12px',
                       color: isApplicationsClosed ? 'rgba(255, 255, 255, 0.5)' : '#0a0f0d',
-                      fontSize: '18px',
+                      fontSize: 'clamp(14px, 3.5vw, 18px)',
                       fontWeight: '700',
                       cursor: isApplicationsClosed ? 'not-allowed' : 'pointer',
                       display: 'flex',
@@ -2548,12 +2579,12 @@ https://cashcity.fun`
 
         {/* ============ STATE: AI IMAGE GENERATING ============ */}
         {submitted && imageGenerating && (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+          <div className="image-gen-section" style={{ textAlign: 'center', padding: 'clamp(40px, 10vw, 60px) clamp(16px, 4vw, 0px)' }}>
             {/* Animated placeholder */}
-            <div style={{
-              width: '200px',
-              height: '200px',
-              margin: '0 auto 32px',
+            <div className="image-gen-placeholder" style={{
+              width: 'clamp(160px, 40vw, 200px)',
+              height: 'clamp(160px, 40vw, 200px)',
+              margin: '0 auto clamp(24px, 6vw, 32px)',
               borderRadius: '20px',
               backgroundColor: 'rgba(35, 60, 55, 0.6)',
               border: '1px solid rgba(93, 130, 120, 0.3)',
@@ -2589,23 +2620,24 @@ https://cashcity.fun`
               </div>
             </div>
             
-            <h2 style={{
+            <h2 className="image-gen-title" style={{
               fontFamily: "'Moderno Sans', sans-serif",
-              fontSize: '28px',
+              fontSize: 'clamp(20px, 5vw, 28px)',
               fontWeight: '400',
               margin: '0 0 12px',
               color: '#D5E59B',
-              letterSpacing: '1px'
+              letterSpacing: 'clamp(0.5px, 0.2vw, 1px)'
             }}>
               Generating Your CEO Portrait...
             </h2>
 
             {/* Time estimate notice */}
             <p style={{
-              fontSize: '14px',
+              fontSize: 'clamp(12px, 3vw, 14px)',
               color: 'rgba(247, 247, 232, 0.5)',
               margin: '0 0 20px',
-              fontStyle: 'italic'
+              fontStyle: 'italic',
+              padding: '0 16px'
             }}>
               This takes about 30-45 seconds — our AI is crafting something unique for you
             </p>
@@ -2619,10 +2651,11 @@ https://cashcity.fun`
               <p
                 key={loadingMessage}
                 style={{
-                  fontSize: '16px',
+                  fontSize: 'clamp(14px, 3.5vw, 16px)',
                   color: 'rgba(247, 247, 232, 0.7)',
                   margin: 0,
-                  animation: 'fadeInUp 0.3s ease-out'
+                  animation: 'fadeInUp 0.3s ease-out',
+                  padding: '0 16px'
                 }}
               >
                 {aiLoadingMessages[loadingMessage]}
@@ -2631,8 +2664,8 @@ https://cashcity.fun`
 
             {/* Progress bar - 45 second animation */}
             <div style={{
-              maxWidth: '300px',
-              margin: '32px auto 0',
+              maxWidth: 'min(300px, calc(100% - 32px))',
+              margin: 'clamp(24px, 6vw, 32px) auto 0',
               height: '4px',
               backgroundColor: 'rgba(93, 130, 120, 0.3)',
               borderRadius: '2px',
@@ -2649,10 +2682,11 @@ https://cashcity.fun`
 
             {/* Fun tip */}
             <p style={{
-              fontSize: '13px',
+              fontSize: 'clamp(11px, 2.5vw, 13px)',
               color: 'rgba(247, 247, 232, 0.4)',
               margin: '24px auto 0',
-              maxWidth: '280px'
+              maxWidth: 'min(280px, calc(100% - 32px))',
+              padding: '0 16px'
             }}>
               Pro tip: The wilder your PFP, the more unique your CEO
             </p>
@@ -2661,48 +2695,49 @@ https://cashcity.fun`
 
         {/* ============ STATE: IMAGE READY - SHARE TO TWITTER ============ */}
         {submitted && imageReady && !tweetVerifying && !tweetVerified && !tweetVerifyFailed && (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <div style={{ textAlign: 'center', padding: 'clamp(24px, 6vw, 40px) clamp(16px, 4vw, 0px)' }}>
             {/* Success badge */}
-            <div style={{
+            <div className="status-badge" style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '8px 16px',
+              padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px)',
               backgroundColor: 'rgba(74, 222, 128, 0.15)',
               border: '1px solid rgba(74, 222, 128, 0.3)',
               borderRadius: '20px',
-              marginBottom: '24px',
+              marginBottom: 'clamp(16px, 4vw, 24px)',
               animation: 'scaleIn 0.5s ease-out'
             }}>
-              <span style={{ color: '#4ADE80', fontSize: '14px' }}>✨</span>
-              <span style={{ color: '#4ADE80', fontSize: '14px', fontWeight: '500' }}>Portrait Ready</span>
+              <span style={{ color: '#4ADE80', fontSize: 'clamp(12px, 3vw, 14px)' }}>✨</span>
+              <span style={{ color: '#4ADE80', fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: '500' }}>Portrait Ready</span>
             </div>
-            
+
             <h2 style={{
               fontFamily: "'Moderno Sans', sans-serif",
-              fontSize: '32px',
+              fontSize: 'clamp(24px, 6vw, 32px)',
               fontWeight: '400',
               margin: '0 0 8px',
               color: '#F7F7E8',
-              letterSpacing: '1px',
+              letterSpacing: 'clamp(0.5px, 0.2vw, 1px)',
               animation: 'fadeInUp 0.5s ease-out'
             }}>
               Your CEO Portrait
             </h2>
-            
+
             <p style={{
-              fontSize: '16px',
+              fontSize: 'clamp(14px, 3.5vw, 16px)',
               color: 'rgba(247, 247, 232, 0.6)',
-              margin: '0 0 32px',
-              animation: 'fadeInUp 0.5s ease-out 0.1s both'
+              margin: '0 0 clamp(24px, 6vw, 32px)',
+              animation: 'fadeInUp 0.5s ease-out 0.1s both',
+              padding: '0 16px'
             }}>
               Share it on X to complete your application
             </p>
             
             {/* Image Preview Card */}
-            <div style={{
-              maxWidth: '400px',
-              margin: '0 auto 32px',
+            <div className="generated-image-card" style={{
+              maxWidth: 'min(400px, calc(100% - 32px))',
+              margin: '0 auto clamp(24px, 6vw, 32px)',
               backgroundColor: 'rgba(35, 60, 55, 0.6)',
               border: '1px solid rgba(93, 130, 120, 0.3)',
               borderRadius: '16px',
@@ -2737,22 +2772,23 @@ https://cashcity.fun`
                   rel="noopener noreferrer"
                   style={{
                     position: 'absolute',
-                    bottom: '12px',
-                    right: '12px',
+                    bottom: 'clamp(8px, 2vw, 12px)',
+                    right: 'clamp(8px, 2vw, 12px)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '8px 14px',
+                    padding: 'clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px)',
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '8px',
                     color: '#F7F7E8',
-                    fontSize: '13px',
+                    fontSize: 'clamp(11px, 2.5vw, 13px)',
                     fontWeight: '500',
                     textDecoration: 'none',
                     cursor: 'pointer',
                     backdropFilter: 'blur(8px)',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    minHeight: '36px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
@@ -2773,40 +2809,41 @@ https://cashcity.fun`
               </div>
 
               {/* Tweet preview */}
-              <div style={{
-                padding: '16px',
+              <div className="tweet-preview" style={{
+                padding: 'clamp(12px, 3vw, 16px)',
                 borderTop: '1px solid rgba(93, 130, 120, 0.2)',
                 textAlign: 'left'
               }}>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
-                  marginBottom: '12px'
+                  gap: 'clamp(8px, 2vw, 12px)',
+                  marginBottom: 'clamp(8px, 2vw, 12px)'
                 }}>
                   <div style={{
-                    width: '40px',
-                    height: '40px',
+                    width: 'clamp(36px, 9vw, 40px)',
+                    height: 'clamp(36px, 9vw, 40px)',
                     borderRadius: '50%',
                     backgroundColor: 'rgba(93, 130, 120, 0.3)',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    flexShrink: 0
                   }}>
                     {userData?.profileImage && (
                       <img src={userData.profileImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     )}
                   </div>
-                  <div>
-                    <div style={{ color: '#F7F7E8', fontWeight: '600', fontSize: '14px' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ color: '#F7F7E8', fontWeight: '600', fontSize: 'clamp(12px, 3vw, 14px)' }}>
                       {userData?.name || 'You'}
                     </div>
-                    <div style={{ color: 'rgba(247, 247, 232, 0.5)', fontSize: '13px' }}>
+                    <div style={{ color: 'rgba(247, 247, 232, 0.5)', fontSize: 'clamp(11px, 2.5vw, 13px)' }}>
                       {userData?.handle || '@yourhandle'}
                     </div>
                   </div>
                 </div>
                 <p style={{
                   color: '#F7F7E8',
-                  fontSize: '15px',
+                  fontSize: 'clamp(13px, 3.2vw, 15px)',
                   margin: 0,
                   lineHeight: 1.4
                 }}>
@@ -2816,29 +2853,29 @@ https://cashcity.fun`
             </div>
             
             {/* Instructions card */}
-            <div style={{
-              marginBottom: '24px',
-              padding: '16px 20px',
+            <div className="instructions-card" style={{
+              marginBottom: 'clamp(16px, 4vw, 24px)',
+              padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)',
               backgroundColor: 'rgba(35, 60, 55, 0.4)',
               border: '1px solid rgba(93, 130, 120, 0.2)',
               borderRadius: '12px',
-              maxWidth: '400px',
+              maxWidth: 'min(400px, calc(100% - 32px))',
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '12px',
-                marginBottom: '12px'
+                gap: 'clamp(8px, 2vw, 12px)',
+                marginBottom: 'clamp(8px, 2vw, 12px)'
               }}>
                 <div style={{
-                  width: '24px',
-                  height: '24px',
+                  width: 'clamp(20px, 5vw, 24px)',
+                  height: 'clamp(20px, 5vw, 24px)',
                   borderRadius: '50%',
                   backgroundColor: 'rgba(213, 229, 155, 0.2)',
                   color: '#D5E59B',
-                  fontSize: '12px',
+                  fontSize: 'clamp(10px, 2.5vw, 12px)',
                   fontWeight: '600',
                   display: 'flex',
                   alignItems: 'center',
@@ -2847,7 +2884,7 @@ https://cashcity.fun`
                 }}>1</div>
                 <p style={{
                   margin: 0,
-                  fontSize: '14px',
+                  fontSize: 'clamp(12px, 3vw, 14px)',
                   color: 'rgba(247, 247, 232, 0.7)',
                   textAlign: 'left',
                   lineHeight: 1.4
@@ -2858,15 +2895,15 @@ https://cashcity.fun`
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '12px'
+                gap: 'clamp(8px, 2vw, 12px)'
               }}>
                 <div style={{
-                  width: '24px',
-                  height: '24px',
+                  width: 'clamp(20px, 5vw, 24px)',
+                  height: 'clamp(20px, 5vw, 24px)',
                   borderRadius: '50%',
                   backgroundColor: 'rgba(213, 229, 155, 0.2)',
                   color: '#D5E59B',
-                  fontSize: '12px',
+                  fontSize: 'clamp(10px, 2.5vw, 12px)',
                   fontWeight: '600',
                   display: 'flex',
                   alignItems: 'center',
@@ -2875,7 +2912,7 @@ https://cashcity.fun`
                 }}>2</div>
                 <p style={{
                   margin: 0,
-                  fontSize: '14px',
+                  fontSize: 'clamp(12px, 3vw, 14px)',
                   color: 'rgba(247, 247, 232, 0.7)',
                   textAlign: 'left',
                   lineHeight: 1.4
@@ -2888,23 +2925,27 @@ https://cashcity.fun`
             {/* Share Button */}
             <button
               onClick={() => { playClick(); handleShareTweet(); }}
+              className="share-btn touch-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '12px',
-                padding: '16px 48px',
+                gap: 'clamp(8px, 2vw, 12px)',
+                padding: 'clamp(14px, 3.5vw, 16px) clamp(32px, 8vw, 48px)',
                 backgroundColor: '#D5E59B',
                 border: 'none',
                 borderRadius: '12px',
                 color: '#0a0f0d',
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 fontWeight: '700',
                 cursor: 'pointer',
                 boxShadow: '0 4px 0 #b8c987',
                 transform: 'translateY(0)',
                 transition: 'all 0.1s ease',
-                animation: 'fadeInUp 0.6s ease-out 0.3s both'
+                animation: 'fadeInUp 0.6s ease-out 0.3s both',
+                minHeight: '44px',
+                width: 'auto',
+                maxWidth: 'calc(100% - 32px)'
               }}
               onMouseDown={(e) => {
                 e.currentTarget.style.transform = 'translateY(2px)';
@@ -2929,11 +2970,11 @@ https://cashcity.fun`
 
         {/* ============ STATE: VERIFYING TWEET ============ */}
         {submitted && tweetVerifying && !tweetVerified && (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{
-              width: '120px',
-              height: '120px',
-              margin: '0 auto 32px',
+          <div className="verify-section" style={{ textAlign: 'center', padding: 'clamp(40px, 10vw, 60px) clamp(16px, 4vw, 0px)' }}>
+            <div className="verify-icon-container" style={{
+              width: 'clamp(100px, 25vw, 120px)',
+              height: 'clamp(100px, 25vw, 120px)',
+              margin: '0 auto clamp(24px, 6vw, 32px)',
               borderRadius: '20px',
               backgroundColor: 'rgba(35, 60, 55, 0.6)',
               border: '1px solid rgba(93, 130, 120, 0.3)',
@@ -2953,14 +2994,14 @@ https://cashcity.fun`
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </div>
-            
-            <h2 style={{
+
+            <h2 className="verify-title" style={{
               fontFamily: "'Moderno Sans', sans-serif",
-              fontSize: '28px',
+              fontSize: 'clamp(20px, 5vw, 28px)',
               fontWeight: '400',
               margin: '0 0 16px',
               color: '#D5E59B',
-              letterSpacing: '1px'
+              letterSpacing: 'clamp(0.5px, 0.2vw, 1px)'
             }}>
               Verifying Your Tweet...
             </h2>
@@ -2968,8 +3009,8 @@ https://cashcity.fun`
             {/* Your portrait - smaller version with download */}
             {generatedImage && (
               <div style={{
-                maxWidth: '200px',
-                margin: '0 auto 24px',
+                maxWidth: 'min(200px, calc(100% - 64px))',
+                margin: '0 auto clamp(16px, 4vw, 24px)',
                 backgroundColor: 'rgba(35, 60, 55, 0.6)',
                 border: '1px solid rgba(93, 130, 120, 0.3)',
                 borderRadius: '12px',
@@ -3034,20 +3075,21 @@ https://cashcity.fun`
               <p
                 key={loadingMessage}
                 style={{
-                  fontSize: '16px',
+                  fontSize: 'clamp(14px, 3.5vw, 16px)',
                   color: 'rgba(247, 247, 232, 0.6)',
                   margin: 0,
-                  animation: 'fadeInUp 0.3s ease-out'
+                  animation: 'fadeInUp 0.3s ease-out',
+                  padding: '0 16px'
                 }}
               >
                 {verifyMessages[loadingMessage]}
               </p>
             </div>
-            
+
             {/* Progress bar */}
             <div style={{
-              maxWidth: '300px',
-              margin: '32px auto 0',
+              maxWidth: 'min(300px, calc(100% - 32px))',
+              margin: 'clamp(24px, 6vw, 32px) auto 0',
               height: '4px',
               backgroundColor: 'rgba(93, 130, 120, 0.3)',
               borderRadius: '2px',
@@ -3060,13 +3102,14 @@ https://cashcity.fun`
                 animation: 'progressBar 5s ease-out forwards'
               }} />
             </div>
-            
+
             <p style={{
-              fontSize: '13px',
+              fontSize: 'clamp(11px, 2.5vw, 13px)',
               color: 'rgba(247, 247, 232, 0.4)',
-              marginTop: '32px'
+              marginTop: 'clamp(24px, 6vw, 32px)',
+              padding: '0 16px'
             }}>
-              Didn't tweet? <span style={{ color: '#D5E59B', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => {
+              Didn't tweet? <span style={{ color: '#D5E59B', cursor: 'pointer', textDecoration: 'underline', minHeight: '44px', display: 'inline-block', lineHeight: '44px', margin: '-20px 0' }} onClick={() => {
                 setTweetVerifying(false);
                 setImageReady(true);
               }}>Go back</span>
@@ -3076,11 +3119,11 @@ https://cashcity.fun`
 
         {/* ============ STATE: VERIFICATION FAILED ============ */}
         {submitted && tweetVerifyFailed && !tweetVerified && (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{
-              width: '120px',
-              height: '120px',
-              margin: '0 auto 32px',
+          <div className="verify-section" style={{ textAlign: 'center', padding: 'clamp(40px, 10vw, 60px) clamp(16px, 4vw, 0px)' }}>
+            <div className="verify-icon-container" style={{
+              width: 'clamp(100px, 25vw, 120px)',
+              height: 'clamp(100px, 25vw, 120px)',
+              margin: '0 auto clamp(24px, 6vw, 32px)',
               borderRadius: '20px',
               backgroundColor: 'rgba(255, 107, 107, 0.1)',
               border: '1px solid rgba(255, 107, 107, 0.3)',
@@ -3095,40 +3138,43 @@ https://cashcity.fun`
               </svg>
             </div>
 
-            <h2 style={{
+            <h2 className="verify-title" style={{
               fontFamily: "'Moderno Sans', sans-serif",
-              fontSize: '28px',
+              fontSize: 'clamp(20px, 5vw, 28px)',
               fontWeight: '400',
               margin: '0 0 16px',
               color: '#FF6B6B',
-              letterSpacing: '1px'
+              letterSpacing: 'clamp(0.5px, 0.2vw, 1px)'
             }}>
               Tweet Not Found
             </h2>
 
             <p style={{
-              fontSize: '16px',
+              fontSize: 'clamp(14px, 3.5vw, 16px)',
               color: 'rgba(247, 247, 232, 0.6)',
-              margin: '0 0 32px',
-              maxWidth: '400px',
+              margin: '0 0 clamp(24px, 6vw, 32px)',
+              maxWidth: 'min(400px, calc(100% - 32px))',
               marginLeft: 'auto',
-              marginRight: 'auto'
+              marginRight: 'auto',
+              padding: '0 16px'
             }}>
               We couldn't find your tweet mentioning @cashcitydotfun. Make sure you've posted it and try again.
             </p>
 
             <button
               onClick={() => { playClick(); handleRetryVerification(); }}
+              className="touch-btn"
               style={{
-                padding: '16px 48px',
+                padding: 'clamp(14px, 3.5vw, 16px) clamp(32px, 8vw, 48px)',
                 backgroundColor: '#D5E59B',
                 border: 'none',
                 borderRadius: '12px',
                 color: '#0a0f0d',
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 fontWeight: '700',
                 cursor: 'pointer',
-                boxShadow: '0 4px 0 #b8c987'
+                boxShadow: '0 4px 0 #b8c987',
+                minHeight: '44px'
               }}
             >
               Try Again
@@ -3612,17 +3658,17 @@ https://cashcity.fun`
 
             {/* ===== OPTION C: Minimal Trophy ===== */}
             {true && (
-              <>
+              <div className="confirmation-section" style={{ padding: 'clamp(16px, 4vw, 0px)' }}>
                 {/* Success badge */}
-                <div style={{
+                <div className="status-badge" style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '8px 16px',
+                  padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px)',
                   backgroundColor: 'rgba(74, 222, 128, 0.15)',
                   border: '1px solid rgba(74, 222, 128, 0.3)',
                   borderRadius: '20px',
-                  fontSize: '14px',
+                  fontSize: 'clamp(12px, 3vw, 14px)',
                   color: '#4ADE80',
                   marginBottom: '16px',
                   animation: 'scaleIn 0.5s ease-out'
@@ -3635,27 +3681,28 @@ https://cashcity.fun`
 
                 {/* Subtitle */}
                 <p style={{
-                  fontSize: '16px',
+                  fontSize: 'clamp(14px, 3.5vw, 16px)',
                   color: 'rgba(247, 247, 232, 0.7)',
-                  marginBottom: '32px',
-                  maxWidth: '400px',
-                  margin: '0 auto 32px',
-                  animation: 'fadeInUp 0.5s ease-out 0.1s both'
+                  marginBottom: 'clamp(24px, 6vw, 32px)',
+                  maxWidth: 'min(400px, calc(100% - 32px))',
+                  margin: '0 auto clamp(24px, 6vw, 32px)',
+                  animation: 'fadeInUp 0.5s ease-out 0.1s both',
+                  padding: '0 16px'
                 }}>
                   Your tweet has been verified. We'll announce selected CEOs on Thursday.
                 </p>
 
                 {/* The Trophy Card */}
-                <div style={{
-                  maxWidth: '380px',
-                  margin: '0 auto 24px',
+                <div className="confirmed-card" style={{
+                  maxWidth: 'min(380px, calc(100% - 32px))',
+                  margin: '0 auto clamp(16px, 4vw, 24px)',
                   animation: 'scaleIn 0.6s ease-out 0.2s both'
                 }}>
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(45, 74, 71, 0.95) 0%, rgba(35, 60, 55, 0.95) 100%)',
                     border: '2px solid rgba(213, 229, 155, 0.5)',
                     borderRadius: '24px',
-                    padding: '40px 32px',
+                    padding: 'clamp(28px, 7vw, 40px) clamp(20px, 5vw, 32px)',
                     position: 'relative',
                     overflow: 'hidden'
                   }}>
@@ -3671,18 +3718,18 @@ https://cashcity.fun`
                     }} />
 
                     {/* User avatar centered */}
-                    <div style={{ 
-                      display: 'flex', 
+                    <div style={{
+                      display: 'flex',
                       justifyContent: 'center',
-                      marginBottom: '20px'
+                      marginBottom: 'clamp(16px, 4vw, 20px)'
                     }}>
                       <div style={{ position: 'relative' }}>
                         <img
                           src={userData?.profileImage}
                           alt=""
                           style={{
-                            width: '80px',
-                            height: '80px',
+                            width: 'clamp(64px, 16vw, 80px)',
+                            height: 'clamp(64px, 16vw, 80px)',
                             borderRadius: '50%',
                             border: '3px solid #D5E59B',
                             boxShadow: '0 0 30px rgba(213, 229, 155, 0.3)'
@@ -3692,8 +3739,8 @@ https://cashcity.fun`
                           position: 'absolute',
                           bottom: '-4px',
                           right: '-4px',
-                          width: '28px',
-                          height: '28px',
+                          width: 'clamp(24px, 6vw, 28px)',
+                          height: 'clamp(24px, 6vw, 28px)',
                           backgroundColor: '#4ADE80',
                           borderRadius: '50%',
                           display: 'flex',
@@ -3709,16 +3756,16 @@ https://cashcity.fun`
                     </div>
 
                     {/* User name */}
-                    <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 'clamp(20px, 5vw, 24px)' }}>
                       <div style={{
-                        fontSize: '18px',
+                        fontSize: 'clamp(16px, 4vw, 18px)',
                         fontWeight: '600',
                         marginBottom: '4px'
                       }}>
                         {userData?.name}
                       </div>
                       <div style={{
-                        fontSize: '14px',
+                        fontSize: 'clamp(12px, 3vw, 14px)',
                         color: 'rgba(247, 247, 232, 0.6)'
                       }}>
                         {userData?.handle}
@@ -3726,23 +3773,23 @@ https://cashcity.fun`
                     </div>
 
                     {/* Big number */}
-                    <div style={{
+                    <div className="application-badge" style={{
                       textAlign: 'center',
-                      padding: '24px 0 0',
+                      padding: 'clamp(20px, 5vw, 24px) 0 0',
                       borderTop: '1px solid rgba(213, 229, 155, 0.2)'
                     }}>
                       <div style={{
-                        fontSize: '11px',
+                        fontSize: 'clamp(9px, 2.2vw, 11px)',
                         color: 'rgba(247, 247, 232, 0.5)',
-                        letterSpacing: '2px',
+                        letterSpacing: 'clamp(1px, 0.4vw, 2px)',
                         marginBottom: '8px',
                         textTransform: 'uppercase'
                       }}>
                         Applicant Number
                       </div>
-                      <div style={{
+                      <div className="application-number" style={{
                         fontFamily: "'Moderno Sans', sans-serif",
-                        fontSize: '52px',
+                        fontSize: 'clamp(40px, 10vw, 52px)',
                         fontWeight: '400',
                         color: '#D5E59B',
                         textShadow: '0 0 40px rgba(213, 229, 155, 0.4)',
@@ -3763,20 +3810,21 @@ https://cashcity.fun`
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '8px',
-                          marginTop: '24px',
-                          padding: '12px 20px',
+                          marginTop: 'clamp(16px, 4vw, 24px)',
+                          padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
                           backgroundColor: 'rgba(29, 155, 240, 0.15)',
                           border: '1px solid rgba(29, 155, 240, 0.3)',
                           borderRadius: '10px',
                           textDecoration: 'none',
-                          transition: 'all 0.2s ease'
+                          transition: 'all 0.2s ease',
+                          minHeight: '44px'
                         }}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="#1D9BF0">
                           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                         </svg>
                         <span style={{
-                          fontSize: '14px',
+                          fontSize: 'clamp(12px, 3vw, 14px)',
                           color: '#1D9BF0',
                           fontWeight: '500'
                         }}>
@@ -3791,10 +3839,10 @@ https://cashcity.fun`
                 </div>
 
                 {/* What's Next */}
-                <div style={{
-                  maxWidth: '380px',
-                  margin: '0 auto 24px',
-                  padding: '20px',
+                <div className="whats-next-card" style={{
+                  maxWidth: 'min(380px, calc(100% - 32px))',
+                  margin: '0 auto clamp(16px, 4vw, 24px)',
+                  padding: 'clamp(16px, 4vw, 20px)',
                   backgroundColor: 'rgba(35, 60, 55, 0.4)',
                   border: '1px solid rgba(93, 130, 120, 0.2)',
                   borderRadius: '12px',
@@ -3802,7 +3850,7 @@ https://cashcity.fun`
                   animation: 'fadeInUp 0.6s ease-out 0.4s both'
                 }}>
                   <div style={{
-                    fontSize: '13px',
+                    fontSize: 'clamp(11px, 2.5vw, 13px)',
                     color: 'rgba(247, 247, 232, 0.5)',
                     marginBottom: '12px',
                     letterSpacing: '1px',
@@ -3813,7 +3861,7 @@ https://cashcity.fun`
                   <div style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px'
+                    gap: 'clamp(8px, 2vw, 10px)'
                   }}>
                     {[
                       { icon: '✓', text: 'Wallet connected', done: true },
@@ -3826,25 +3874,26 @@ https://cashcity.fun`
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
+                          gap: 'clamp(8px, 2vw, 12px)',
                           opacity: step.done ? 1 : 0.5
                         }}
                       >
                         <div style={{
-                          width: '24px',
-                          height: '24px',
+                          width: 'clamp(20px, 5vw, 24px)',
+                          height: 'clamp(20px, 5vw, 24px)',
                           borderRadius: '50%',
                           backgroundColor: step.done ? 'rgba(74, 222, 128, 0.2)' : 'rgba(255, 255, 255, 0.05)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '12px',
-                          color: step.done ? '#4ADE80' : 'rgba(247, 247, 232, 0.5)'
+                          fontSize: 'clamp(10px, 2.5vw, 12px)',
+                          color: step.done ? '#4ADE80' : 'rgba(247, 247, 232, 0.5)',
+                          flexShrink: 0
                         }}>
                           {step.icon}
                         </div>
                         <span style={{
-                          fontSize: '14px',
+                          fontSize: 'clamp(12px, 3vw, 14px)',
                           color: step.done ? '#F7F7E8' : 'rgba(247, 247, 232, 0.6)'
                         }}>
                           {step.text}
@@ -3855,21 +3904,23 @@ https://cashcity.fun`
                 </div>
 
                 {/* Follow CTA */}
-                <a 
+                <a
                   href="https://x.com/cashcitydotfun"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="follow-cta"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    padding: '14px 24px',
+                    padding: 'clamp(12px, 3vw, 14px) clamp(20px, 5vw, 24px)',
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '10px',
                     color: 'rgba(247, 247, 232, 0.7)',
-                    fontSize: '14px',
-                    textDecoration: 'none'
+                    fontSize: 'clamp(12px, 3vw, 14px)',
+                    textDecoration: 'none',
+                    minHeight: '44px'
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -3880,9 +3931,10 @@ https://cashcity.fun`
 
                 {/* Footer */}
                 <p style={{
-                  fontSize: '13px',
+                  fontSize: 'clamp(11px, 2.5vw, 13px)',
                   color: 'rgba(247, 247, 232, 0.4)',
-                  marginTop: '24px'
+                  marginTop: 'clamp(16px, 4vw, 24px)',
+                  padding: '0 16px'
                 }}>
                   If selected, you'll receive your own invite codes — everyone else needs you to play
                 </p>
@@ -3891,15 +3943,16 @@ https://cashcity.fun`
                 <button
                   onClick={resetApplication}
                   style={{
-                    marginTop: '32px',
-                    padding: '8px 16px',
+                    marginTop: 'clamp(24px, 6vw, 32px)',
+                    padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px)',
                     backgroundColor: 'transparent',
                     border: '1px solid rgba(255, 107, 107, 0.3)',
                     borderRadius: '8px',
                     color: 'rgba(255, 107, 107, 0.7)',
-                    fontSize: '12px',
+                    fontSize: 'clamp(10px, 2.5vw, 12px)',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    minHeight: '44px'
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(255, 107, 107, 0.1)';
@@ -3912,7 +3965,7 @@ https://cashcity.fun`
                 >
                   Start over with different account
                 </button>
-              </>
+              </div>
             )}
 
           </div>
