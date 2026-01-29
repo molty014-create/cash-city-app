@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
-import CEOGallery from './components/CEOGallery';
+// CEO Gallery removed - can re-enable later
 
 // Fire-and-forget analytics tracking
 const trackEvent = (eventName, walletAddress = null, twitterUsername = null, metadata = {}) => {
@@ -1420,8 +1420,7 @@ https://cashcity.fun`
               </div>
             </div>
 
-            {/* CEO Gallery - Hall of Fame */}
-            <CEOGallery />
+            {/* CEO Gallery removed - can re-enable later */}
 
             {/* Application Card */}
             <div className="app-card" style={{
