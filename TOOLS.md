@@ -2,34 +2,23 @@
 
 Skills define *how* tools work. This file is for *your* specifics — the stuff that's unique to your setup.
 
-## What Goes Here
+## API Keys
+- **Anthropic Backup:** `.secrets/backup-api-key.txt` (NOT committed to git)
+- **Monitor via:** `session_status` - check "Week X% left"
+- **Alert threshold:** <20% weekly usage
 
-Things like:
-- Camera names and locations
-- SSH hosts and aliases  
-- Preferred voices for TTS
-- Speaker/room names
-- Device nicknames
-- Anything environment-specific
+## Vercel Deployment
+- **Token:** B7BLfDUxTSXBjmOCO5looCat
+- **Malty Panel:** mx9k4v2-panel.vercel.app
+- **Cash City:** cashcity.vercel.app (if needed)
 
-## Examples
+## Git Repos
+- **Malty workspace:** /Users/will/clawd → github.com/molty014-create/cash-city-app
+- **Malty panel:** /Users/will/clawd/malty-panel → github.com/molty014-create/malty-ctrl-x7k9
 
-```markdown
-### Cameras
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
-
-### SSH
-- home-server → 192.168.1.100, user: admin
-
-### TTS
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
-```
-
-## Why Separate?
-
-Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
+## TTS
+- Preferred browser voice: Samantha or Daniel (macOS)
+- For ElevenLabs: check if `sag` is available
 
 ---
 
