@@ -11,9 +11,12 @@
 4. **Check API credits:** Run session_status and check "Week X% left" - if <20%, alert Will
 
 ## API Key Monitoring
-- Primary: Current key in Gateway config
+- Primary: Current key in Gateway config  
 - Backup: `/Users/will/clawd/.secrets/backup-api-key.txt`
-- If credits run low (<20% weekly), notify Will or swap keys
+- Monitor: `session_status` shows "Week X% left"
+- **If credits low (<20%):** Alert Will
+- **If credits exhausted:** Run `./scripts/swap-api-key.sh`
+- **Auto-check:** launchd job runs every 30min (com.malty.api-monitor)
 
 ## Current Focus (Night of Jan 29-30, 2026)
 Building out the control panel with real functionality:
