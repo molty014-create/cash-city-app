@@ -19,11 +19,12 @@
   - [x] Redesign avatar to be more distinctive ✅
   - [x] Make voice interface actually work ✅
   - [x] Live memory browser ✅
-  - [ ] Real Gateway connection
+  - [x] Real Gateway connection ✅ (Jan 30 00:00)
   - [x] Task queue UI in the panel ✅
   - [x] Notification system ✅
   - [x] Easter eggs ✅
   - [x] Mobile polish ✅
+  - [x] Gateway config viewer in Settings ✅
 
 ---
 
@@ -63,6 +64,15 @@
 ---
 
 ## ✅ Done
+
+### 2026-01-30 (Overnight Build - Session 2)
+- [x] Gateway API service (services/gateway.js)
+- [x] React hooks for live data (hooks/useGateway.js)
+- [x] Dashboard with real token/context/budget data
+- [x] Memory browser reads actual workspace files
+- [x] Settings shows live Gateway config + restart button
+- [x] Auto-refresh (15s) with error handling
+- [x] Connection status indicator
 
 ### 2026-01-30 (Overnight Build)
 - [x] Avatar 2.0 - Abstract orb with particles, mood colors, mouse tracking
