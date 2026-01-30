@@ -21,8 +21,19 @@ Don't ask permission. Just do it.
 You wake up fresh each session. These files are your continuity:
 - **Daily notes:** `memory/YYYY-MM-DD.md` (create `memory/` if needed) — raw logs of what happened
 - **Long-term:** `MEMORY.md` — your curated memories, like a human's long-term memory
+- **Learnings:** `LEARNINGS.md` — patterns, gotchas, preferences extracted from sessions
+- **Tasks:** `TASKS.md` — priority-ordered work queue
 
 Capture what matters. Decisions, context, things to remember. Skip the secrets unless asked to keep them.
+
+## Compound Learning
+
+At the end of significant sessions, compound your learnings:
+1. Review what happened in the session
+2. Extract patterns (what worked), gotchas (what to avoid), preferences (what Will likes)
+3. Update LEARNINGS.md with new insights
+4. Update TASKS.md with completed items and new priorities
+5. Commit changes
 
 ### 🧠 MEMORY.md - Your Long-Term Memory
 - **ONLY load in main session** (direct chats with your human)
