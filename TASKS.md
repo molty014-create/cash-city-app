@@ -16,23 +16,24 @@
 - **Status:** Active (overnight build session)
 - **Goal:** Transform from demo to real, functional platform
 - **Subtasks:**
-  - [ ] Redesign avatar to be more distinctive
-  - [ ] Make voice interface actually work
-  - [ ] Live memory browser
+  - [x] Redesign avatar to be more distinctive ✅
+  - [x] Make voice interface actually work ✅
+  - [x] Live memory browser ✅
   - [ ] Real Gateway connection
-  - [ ] Task queue UI in the panel
-  - [ ] Notification system
-  - [ ] Easter eggs
-  - [ ] Mobile polish
+  - [x] Task queue UI in the panel ✅
+  - [x] Notification system ✅
+  - [x] Easter eggs ✅
+  - [x] Mobile polish ✅
 
 ---
 
 ## 🟡 Up Next
 
-### Set up compound learning automation
-- Create cron job for nightly review
-- Auto-update LEARNINGS.md
-- Self-improve instructions based on patterns
+### Real Gateway API integration
+- Connect panel to actual Gateway
+- Real-time token tracking
+- Session history viewer
+- Live status updates
 
 ### Cash City launch prep
 - Final testing before launch
@@ -63,6 +64,17 @@
 
 ## ✅ Done
 
+### 2026-01-30 (Overnight Build)
+- [x] Avatar 2.0 - Abstract orb with particles, mood colors, mouse tracking
+- [x] Comms v2 - Smart responses, voice visualization, avatar integration
+- [x] Easter eggs - Konami code, "malty" secret word, random thoughts
+- [x] Memory browser - File tree, markdown preview, search
+- [x] Task queue UI - Priorities, subtasks, progress bars, filters
+- [x] Notification system - Toast provider with types
+- [x] API monitoring - Backup key, launchd job, swap script
+- [x] Custom skills - malty-compound, malty-identity, malty-overnight
+- [x] Compound learning docs - LEARNINGS.md structure
+
 ### 2026-01-29
 - [x] Analytics system for Cash City (6 events, funnel tracking)
 - [x] Analytics dashboard (standalone HTML)
@@ -76,4 +88,4 @@
 
 ---
 
-*Last updated: 2026-01-29 16:55 PST*
+*Last updated: 2026-01-30 06:30 GST*

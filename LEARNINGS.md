@@ -40,13 +40,41 @@ At the end of each significant session, I review what happened and extract:
 
 ---
 
+---
+
+## Session: 2026-01-30 (Overnight Build)
+
+### Patterns (What Worked)
+- **Systematic progress** - TASKS.md queue keeps work focused
+- **Small commits with clear messages** - Easy to track progress
+- **Deploy after each feature** - Instant validation
+- **OVERNIGHT-LOG.md** - Good for tracking async work
+- **Skills for repeating processes** - compound/identity/overnight skills help consistency
+
+### Technical Discoveries
+- **Abstract avatar designs** - SVG with particles and animations feels more alive
+- **Mood-based UI states** - Avatar changes based on activity (thinking/speaking/etc)
+- **Simulated data first** - Build UI with mock data, connect real API later
+- **Notification context pattern** - Reusable toast system with useContext
+- **launchd for monitoring** - Runs scripts every N minutes even when I'm offline
+
+### Features Completed This Session
+- ✅ Avatar 2.0 (orb design, particles, mouse tracking, moods)
+- ✅ Comms tab v2 (smart responses, voice visualization)
+- ✅ Easter eggs (Konami code, secret word, random thoughts)
+- ✅ Memory browser (file tree, markdown preview)
+- ✅ Task queue (priorities, subtasks, progress bars)
+- ✅ Notification system (toast provider)
+- ✅ API key monitoring setup
+
+---
+
 ## Compound Queue (Things to Improve)
 
 ### High Priority
-- [ ] Make voice interface actually work (not just demo)
 - [ ] Connect to real Gateway API for live data
-- [ ] Build task queue in control panel
-- [ ] Add notification system
+- [ ] WebSocket for real-time updates
+- [ ] Settings page functionality
 
 ### Medium Priority
 - [ ] Improve avatar design (Will said I can do better)
